@@ -24,7 +24,22 @@ import {
   AreaChart,
 } from "recharts";
 
-const INDEX_TITLE = "Indeks";
+const INDEX_TITLE = "Max Indeks";
+function getLevel(index: number) {
+  if (index < 60) return "Du kan drikke 2-3 øl og måske et shot.";
+  if (index < 80) return "Du skal stoppe før 'point of return'";
+  if (index < 100) return "Du skal i byen.";
+  if (index < 110)
+    return "Du skal minimum have én ølbong og til camp fest i Dream City.";
+  if (index < 120)
+    return "Du skal stå på LA bar omkring 2:30 og bestille 10 ekstra shots.";
+  if (index < 130)
+    return "Du vågner nok i bunden af P og kan ikke rigtig huske aftenen.";
+  if (index < 140)
+    return "Du bliver højest sandsynligt smidt ud af en natklub i aften.";
+  return "Ingen har opnået dette og samtidig kunne rapportere omkring aftenen.";
+}
+
 const DAYS = [
   "Mandag",
   "Tirsdag",
@@ -79,7 +94,7 @@ interface ChartData {
 
 function App() {
   const [selectedDay, setSelectedDay] = useState<string>("Fredag");
-  const [xIndex, setXIndex] = useState<number>(100);
+  const [xIndex, setXIndex] = useState<number>(80);
   const [claudemir, setClaudemir] = useState<string>("Nej");
   const [gle, setGle] = useState<string>("Nej");
   const [viewMode, setViewMode] = useState<"single" | "graph">("single");
@@ -340,6 +355,9 @@ function App() {
                         </Text>
                         <Text fw={700} size="24px" className="text-gray-900">
                           {getSingleAgeIndex(selectedAge).toFixed(1)}
+                        </Text>
+                        <Text size="sm" className="text-gray-700">
+                          {getLevel(getSingleAgeIndex(selectedAge))}
                         </Text>
                       </Stack>
                     </Paper>
