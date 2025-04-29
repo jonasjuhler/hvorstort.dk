@@ -11,16 +11,17 @@ import {
   SegmentedControl,
   Paper,
   Text,
-  NumberInput,
+  Group,
+  Box,
 } from "@mantine/core";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Area,
+  AreaChart,
 } from "recharts";
 
 const INDEX_TITLE = "Indeks";
@@ -34,7 +35,7 @@ const DAYS = [
   "Søndag",
 ];
 const CLAUDEMIR_OPTIONS = ["Ja", "Nej"];
-const GLE_OPTIONS = ["Nej", "Gle", "Gle Gle"];
+const GLE_OPTIONS = ["Ja", "Nej", "Gle Gle"];
 const indexBaseline = [
   { base: 90, min: 80, max: 140, age: 18 },
   { base: 100, min: 90, max: 150, age: 19 },
@@ -150,21 +151,20 @@ function App() {
     return data;
   };
 
-  // Regenerate chart data when inputs change
-  const chartData = generateChartData();
-  const allInputsFilled = selectedDay && claudemir && gle;
-
   const getSingleAgeIndex = (age: number): number => {
     const chartData = generateChartData();
     const ageData = chartData.find((data) => data.alder === age);
     return ageData?.storhedsindex || 0;
   };
 
+  const chartData = generateChartData();
+  const allInputsFilled = selectedDay && claudemir && gle;
+
   return (
     <MantineProvider
       theme={{
-        primaryColor: "blue",
-        fontFamily: "Inter, sans-serif",
+        primaryColor: "indigo",
+        fontFamily: "Inter, system-ui, sans-serif",
         components: {
           Container: {
             defaultProps: {
@@ -172,160 +172,259 @@ function App() {
             },
           },
         },
+        other: {
+          borderRadius: "0.75rem",
+        },
       }}
     >
-      <Container
-        size="sm"
-        className="py-8 px-4 max-w-full md:max-w-2xl mx-auto"
-      >
-        <Title order={2} className="text-center mb-6 text-base md:text-lg">
-          Hvor Stort Kan Du Gå?
-        </Title>
-
-        <Stack gap={rem(16)}>
-          <Select
-            label="Hvornår skal du ud?"
-            data={DAYS}
-            value={selectedDay}
-            onChange={(value) => setSelectedDay(value || "Fredag")}
-            className="w-full"
-            required
-          />
-
-          <div className="w-full">
-            <label className="block mb-2 font-medium">
-              Hvad er xIndex for dine venner? (Expected Avg. Index)
-            </label>
-            <Slider
-              value={xIndex}
-              onChange={setXIndex}
-              min={50}
-              max={150}
-              className="mt-4"
-              marks={[
-                { value: 50, label: "50" },
-                { value: 100, label: "100" },
-                { value: 150, label: "150" },
-              ]}
-            />
-          </div>
-
-          <Radio.Group
-            label="Skal Claudemir med dig i byen?"
-            value={claudemir}
-            onChange={setClaudemir}
-            required
-            className="w-full"
+      <Box className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+        <Container
+          size="sm"
+          className="py-12 px-4 max-w-full md:max-w-2xl mx-auto"
+        >
+          <Title
+            order={2}
+            className="text-center mb-10 text-base md:text-lg font-light"
           >
-            <div className="flex gap-4 mt-2">
-              {CLAUDEMIR_OPTIONS.map((option) => (
-                <Radio key={option} value={option} label={option} />
-              ))}
-            </div>
-          </Radio.Group>
+            <span className="text-indigo-600 font-semibold">Hvor Stort</span>{" "}
+            Kan Du Gå?
+          </Title>
 
-          <Radio.Group
-            label="Er du Gle?"
-            value={gle}
-            onChange={setGle}
-            required
-            className="w-full"
+          <Paper
+            shadow="sm"
+            p="lg"
+            className="bg-white rounded-xl mb-6"
+            withBorder
           >
-            <div className="flex gap-4 mt-2">
-              {GLE_OPTIONS.map((option) => (
-                <Radio key={option} value={option} label={option} />
-              ))}
-            </div>
-          </Radio.Group>
+            <Stack gap={rem(24)}>
+              <div>
+                <Select
+                  label={
+                    <Text size="sm" fw={500} className="text-gray-700 mb-1">
+                      Hvornår skal du ud?
+                    </Text>
+                  }
+                  data={DAYS}
+                  value={selectedDay}
+                  onChange={(value) => setSelectedDay(value || "Fredag")}
+                  className="w-full"
+                  required
+                  styles={{
+                    input: { borderRadius: "8px" },
+                  }}
+                />
+              </div>
+
+              <div>
+                <Text size="sm" fw={500} className="text-gray-700 mb-1">
+                  Hvad er xIndex for dine venner?
+                </Text>
+                <Slider
+                  value={xIndex}
+                  onChange={setXIndex}
+                  min={50}
+                  max={150}
+                  className="mt-6"
+                  marks={[
+                    { value: 50, label: "50" },
+                    { value: 100, label: "100" },
+                    { value: 150, label: "150" },
+                  ]}
+                  styles={{
+                    mark: { width: "4px" },
+                    thumb: {
+                      height: "18px",
+                      width: "18px",
+                      borderWidth: "2px",
+                    },
+                  }}
+                />
+              </div>
+
+              <div>
+                <Text size="sm" fw={500} className="text-gray-700 mb-3">
+                  Skal Claudemir med dig i byen?
+                </Text>
+                <Radio.Group
+                  value={claudemir}
+                  onChange={setClaudemir}
+                  required
+                  className="w-full"
+                >
+                  <Group mt="xs">
+                    {CLAUDEMIR_OPTIONS.map((option) => (
+                      <Radio key={option} value={option} label={option} />
+                    ))}
+                  </Group>
+                </Radio.Group>
+              </div>
+
+              <div>
+                <Text size="sm" fw={500} className="text-gray-700 mb-3">
+                  Er du Gle?
+                </Text>
+                <Radio.Group
+                  value={gle}
+                  onChange={setGle}
+                  required
+                  className="w-full"
+                >
+                  <Group mt="xs">
+                    {GLE_OPTIONS.map((option) => (
+                      <Radio key={option} value={option} label={option} />
+                    ))}
+                  </Group>
+                </Radio.Group>
+              </div>
+            </Stack>
+          </Paper>
 
           {allInputsFilled && (
-            <>
-              <SegmentedControl
-                value={viewMode}
-                onChange={(value) => setViewMode(value as "single" | "graph")}
-                data={[
-                  { label: "Tal", value: "single" },
-                  { label: "Graf", value: "graph" },
-                ]}
-                className="self-center mt-4"
-              />
+            <Paper
+              shadow="sm"
+              p="lg"
+              className="bg-white rounded-xl"
+              withBorder
+            >
+              <Stack gap={rem(16)}>
+                <SegmentedControl
+                  value={viewMode}
+                  onChange={(value) => setViewMode(value as "single" | "graph")}
+                  data={[
+                    { label: "Tal", value: "single" },
+                    { label: "Graf", value: "graph" },
+                  ]}
+                  className="self-center my-2"
+                  fullWidth
+                  radius="md"
+                  styles={{
+                    root: { border: "1px solid #e5e7eb" },
+                  }}
+                />
 
-              {viewMode === "single" ? (
-                <div className="mt-4">
-                  <NumberInput
-                    label="Alder"
-                    value={selectedAge}
-                    onChange={(value) => setSelectedAge(Number(value))}
-                    min={18}
-                    max={50}
-                    className="mb-4"
-                  />
-                  <Paper
-                    shadow="sm"
-                    p="lg"
-                    className="
-                      bg-gray-50
-                      rounded-lg
-                      border border-gray-200
-                    "
-                  >
-                    <Stack gap={rem(6)} align="center">
-                      <Text fw={500} size="md" className="text-gray-700">
-                        {`Dit ${INDEX_TITLE}:`}
+                {viewMode === "single" ? (
+                  <div className="mt-4 flex flex-col gap-6">
+                    <div>
+                      <Text size="sm" fw={500} className="text-gray-700 mb-1">
+                        {`Alder: ${selectedAge}`}
                       </Text>
-                      <Text fw={700} size="24px" className="text-gray-900">
-                        {getSingleAgeIndex(selectedAge).toFixed(1)}
-                      </Text>
-                    </Stack>
-                  </Paper>
-                </div>
-              ) : (
-                <div className="h-[300px] md:h-[400px] w-full mt-4">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart
-                      data={chartData}
-                      margin={{ top: 20, right: 0, left: 10, bottom: 15 }}
+                      <Slider
+                        value={selectedAge}
+                        onChange={setSelectedAge}
+                        min={18}
+                        max={50}
+                        className="mt-6"
+                        marks={[
+                          { value: 18, label: "18" },
+                          { value: 34, label: "34" },
+                          { value: 50, label: "50" },
+                        ]}
+                        styles={{
+                          mark: { width: "4px" },
+                          thumb: {
+                            height: "18px",
+                            width: "18px",
+                            borderWidth: "2px",
+                          },
+                        }}
+                      />
+                    </div>
+                    <Paper
+                      shadow="xs"
+                      p="md"
+                      className="bg-gray-50 rounded-lg border border-gray-200 w-full flex justify-center"
                     >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis
-                        dataKey="alder"
-                        label={{
-                          value: "Alder",
-                          position: "insideBottom",
-                          offset: -10,
-                        }}
-                        tick={{ fontSize: 12 }}
-                      />
-                      <YAxis
-                        label={{
-                          value: INDEX_TITLE,
-                          angle: -90,
-                          position: "insideLeft",
-                          offset: 0,
-                        }}
-                        tick={{ fontSize: 12 }}
-                        domain={[60, 160]}
-                        ticks={[60, 80, 100, 120, 140, 160]}
-                      />
-                      <Tooltip
-                        formatter={(value) => [`${value}`, INDEX_TITLE]}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="storhedsindex"
-                        stroke="#8884d8"
-                        strokeWidth={2}
-                        dot={{ r: 2 }}
-                        activeDot={{ r: 6 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
-            </>
+                      <Stack gap={rem(6)} align="center">
+                        <Text fw={500} size="md" className="text-gray-700">
+                          {`Dit ${INDEX_TITLE}:`}
+                        </Text>
+                        <Text fw={700} size="24px" className="text-gray-900">
+                          {getSingleAgeIndex(selectedAge).toFixed(1)}
+                        </Text>
+                      </Stack>
+                    </Paper>
+                  </div>
+                ) : (
+                  <div className="h-[350px] md:h-[400px] w-full mt-4">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart
+                        data={chartData}
+                        margin={{ top: 20, right: 0, left: 10, bottom: 15 }}
+                      >
+                        <defs>
+                          <linearGradient
+                            id="colorIndex"
+                            x1="0"
+                            y1="0"
+                            x2="0"
+                            y2="1"
+                          >
+                            <stop
+                              offset="5%"
+                              stopColor="#6366f1"
+                              stopOpacity={0.8}
+                            />
+                            <stop
+                              offset="95%"
+                              stopColor="#6366f1"
+                              stopOpacity={0.1}
+                            />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid
+                          strokeDasharray="3 3"
+                          vertical={false}
+                          stroke="#f0f0f0"
+                        />
+                        <XAxis
+                          dataKey="alder"
+                          label={{
+                            value: "Alder",
+                            position: "insideBottom",
+                            offset: -10,
+                          }}
+                          tick={{ fontSize: 12 }}
+                          stroke="#9ca3af"
+                        />
+                        <YAxis
+                          label={{
+                            value: INDEX_TITLE,
+                            angle: -90,
+                            position: "insideLeft",
+                            offset: 0,
+                          }}
+                          tick={{ fontSize: 12 }}
+                          domain={[60, 160]}
+                          ticks={[60, 80, 100, 120, 140, 160]}
+                          stroke="#9ca3af"
+                        />
+                        <Tooltip
+                          formatter={(value) => [`${value}`, INDEX_TITLE]}
+                          contentStyle={{
+                            borderRadius: "8px",
+                            border: "none",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                            padding: "10px",
+                          }}
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="storhedsindex"
+                          stroke="#6366f1"
+                          strokeWidth={2}
+                          fillOpacity={1}
+                          fill="url(#colorIndex)"
+                          activeDot={{ r: 6 }}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </Stack>
+            </Paper>
           )}
-        </Stack>
-      </Container>
+        </Container>
+      </Box>
     </MantineProvider>
   );
 }
