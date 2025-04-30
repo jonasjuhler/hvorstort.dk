@@ -27,8 +27,8 @@ import {
 const INDEX_TITLE = "Max Indeks";
 function getLevel(index: number) {
   if (index < 60) return "Du kan drikke 2-3 øl og måske et shot.";
-  if (index < 80) return "Du skal stoppe før 'point of return'";
-  if (index < 100) return "Du skal i byen.";
+  if (index < 80) return "Du skal stoppe før 'point of no return'.";
+  if (index < 100) return "Du skal i byen - men ikke noget vildt.";
   if (index < 110)
     return "Du skal minimum have én ølbong og til camp fest i Dream City.";
   if (index < 120)
